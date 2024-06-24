@@ -8,6 +8,7 @@ use crate::{RespDecode, RespErr, SimpleError, SimpleString};
 pub enum RespFrame {
     SimpleString(SimpleString),
     SimpleError(SimpleError),
+    Integer(i64),
 }
 
 impl RespDecode for RespFrame {
@@ -24,6 +25,10 @@ impl RespDecode for RespFrame {
                 let frame = SimpleError::decode(buf)?;
                 Ok(frame.into())
             }
+            Some(b':') => {
+                let frame = i64::decode(buf)?;
+                Ok(frame.into())
+            }
             _ => Err(RespErr::NotComplete),
         }
     }
@@ -33,6 +38,7 @@ impl RespDecode for RespFrame {
         match iter.next() {
             Some(b'+') => SimpleString::expect_len(buf),
             Some(b'-') => SimpleError::expect_len(buf),
+            Some(b':') => i64::expect_len(buf),
             _ => Err(RespErr::NotComplete),
         }
     }

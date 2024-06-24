@@ -5,6 +5,7 @@ use thiserror::Error;
 pub use self::{frame::RespFrame, simple_error::SimpleError, simple_string::SimpleString};
 
 mod frame;
+mod integer;
 mod simple_error;
 mod simple_string;
 
@@ -29,6 +30,9 @@ pub enum RespErr {
     NotComplete,
     #[error("Invalid frame type: {0}")]
     InvalidFrameType(String),
+
+    #[error("Parse error: {0}")]
+    ParseIntError(#[from] std::num::ParseIntError),
 }
 
 fn find_crlf(buf: &[u8], nth: usize) -> Option<usize> {

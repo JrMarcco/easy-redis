@@ -3,7 +3,6 @@ use crate::{RespDecode, RespEncode, RespErr};
 use bytes::BytesMut;
 use std::ops::Deref;
 
-// -Error message\r\n
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 pub struct SimpleError(pub(crate) String);
 
@@ -13,6 +12,9 @@ impl RespEncode for SimpleError {
     }
 }
 
+// Simple errors, or simply just errors, are similar to simple strings,
+// but their first character is the minus (-) character.
+// -Error message\r\n
 impl RespDecode for SimpleError {
     const PREFIX: &'static str = "-";
 

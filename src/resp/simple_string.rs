@@ -3,9 +3,6 @@ use crate::{RespDecode, RespEncode, RespErr};
 use bytes::BytesMut;
 use std::ops::Deref;
 
-// Simple strings are encoded as a plus (+) character, followed by a string.
-// The string mustn't contain a CR (\r) or LF (\n) character and is terminated by CRLF (i.e., \r\n).
-// +OK\r\n
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
 pub struct SimpleString(pub(crate) String);
 
@@ -15,6 +12,9 @@ impl RespEncode for SimpleString {
     }
 }
 
+// Simple strings are encoded as a plus (+) character, followed by a string.
+// The string mustn't contain a CR (\r) or LF (\n) character and is terminated by CRLF (i.e., \r\n).
+// +OK\r\n
 impl RespDecode for SimpleString {
     const PREFIX: &'static str = "+";
 
