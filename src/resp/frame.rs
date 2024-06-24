@@ -31,14 +31,17 @@ impl RespDecode for RespFrame {
                 let frame = i64::decode(buf)?;
                 Ok(frame.into())
             }
-            Some(b'$') => match NullBulkString::decode(buf) {
-                Ok(frame) => Ok(frame.into()),
-                Err(RespErr::NotComplete) => Err(RespErr::NotComplete),
-                Err(_) => {
-                    let frame = BulkString::decode(buf)?;
-                    Ok(frame.into())
+            Some(b'$') => {
+                // try null first
+                match NullBulkString::decode(buf) {
+                    Ok(frame) => Ok(frame.into()),
+                    Err(RespErr::NotComplete) => Err(RespErr::NotComplete),
+                    Err(_) => {
+                        let frame = BulkString::decode(buf)?;
+                        Ok(frame.into())
+                    }
                 }
-            },
+            }
             _ => Err(RespErr::NotComplete),
         }
     }
