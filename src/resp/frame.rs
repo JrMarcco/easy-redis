@@ -1,12 +1,13 @@
 use bytes::BytesMut;
 use enum_dispatch::enum_dispatch;
 
-use crate::{RespDecode, RespErr, SimpleString};
+use crate::{RespDecode, RespErr, SimpleError, SimpleString};
 
 #[enum_dispatch(RespEncode)]
 #[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum RespFrame {
     SimpleString(SimpleString),
+    SimpleError(SimpleError),
 }
 
 impl RespDecode for RespFrame {
@@ -19,6 +20,10 @@ impl RespDecode for RespFrame {
                 let frame = SimpleString::decode(buf)?;
                 Ok(frame.into())
             }
+            Some(b'-') => {
+                let frame = SimpleError::decode(buf)?;
+                Ok(frame.into())
+            }
             _ => Err(RespErr::NotComplete),
         }
     }
@@ -27,6 +32,7 @@ impl RespDecode for RespFrame {
         let mut iter = buf.iter().peekable();
         match iter.next() {
             Some(b'+') => SimpleString::expect_len(buf),
+            Some(b'-') => SimpleError::expect_len(buf),
             _ => Err(RespErr::NotComplete),
         }
     }

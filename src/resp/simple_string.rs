@@ -3,12 +3,12 @@ use crate::{RespDecode, RespEncode, RespErr};
 use bytes::BytesMut;
 use std::ops::Deref;
 
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
-pub struct SimpleString(pub(crate) String);
-
 // Simple strings are encoded as a plus (+) character, followed by a string.
 // The string mustn't contain a CR (\r) or LF (\n) character and is terminated by CRLF (i.e., \r\n).
 // +OK\r\n
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd)]
+pub struct SimpleString(pub(crate) String);
+
 impl RespEncode for SimpleString {
     fn encode(self) -> Vec<u8> {
         format!("+{}\r\n", self.0).into_bytes()
@@ -21,6 +21,7 @@ impl RespDecode for SimpleString {
     fn decode(buf: &mut BytesMut) -> Result<Self, RespErr> {
         let end = extract_frame_data(buf, Self::PREFIX)?;
         let data = buf.split_to(end + CRLF_LEN);
+
         let s = String::from_utf8_lossy(&data[Self::PREFIX.len()..end]);
         Ok(SimpleString::new(s.to_string()))
     }

@@ -2,9 +2,10 @@ use bytes::BytesMut;
 use enum_dispatch::enum_dispatch;
 use thiserror::Error;
 
-pub use self::{frame::RespFrame, simple_string::SimpleString};
+pub use self::{frame::RespFrame, simple_error::SimpleError, simple_string::SimpleString};
 
 mod frame;
+mod simple_error;
 mod simple_string;
 
 const CRLF: &[u8] = b"\r\n";
