@@ -1,9 +1,13 @@
-use bytes::BytesMut;
+use bytes::{Buf, BytesMut};
 use enum_dispatch::enum_dispatch;
 use thiserror::Error;
 
-pub use self::{frame::RespFrame, simple_error::SimpleError, simple_string::SimpleString};
+pub use self::{
+    bulk_string::BulkString, bulk_string::NullBulkString, frame::RespFrame,
+    simple_error::SimpleError, simple_string::SimpleString,
+};
 
+mod bulk_string;
 mod frame;
 mod integer;
 mod simple_error;
@@ -63,4 +67,26 @@ fn extract_frame_data(buf: &[u8], prefix: &str) -> Result<usize, RespErr> {
 
     let end = find_crlf(buf, 1).ok_or(RespErr::NotComplete)?;
     Ok(end)
+}
+
+fn extract_fixed_data(buf: &mut BytesMut, expect: &str, expect_type: &str) -> Result<(), RespErr> {
+    if buf.len() < expect.len() {
+        return Err(RespErr::NotComplete);
+    }
+
+    if !buf.starts_with(expect.as_bytes()) {
+        return Err(RespErr::InvalidFrameType(format!(
+            "expect: {}, got: {:?}",
+            expect_type, buf
+        )));
+    }
+
+    buf.advance(expect.len());
+    Ok(())
+}
+
+fn parse_len(buf: &[u8], prefix: &str) -> Result<(usize, usize), RespErr> {
+    let end = extract_frame_data(buf, prefix)?;
+    let s = String::from_utf8_lossy(&buf[prefix.len()..end]);
+    Ok((end, s.parse()?))
 }

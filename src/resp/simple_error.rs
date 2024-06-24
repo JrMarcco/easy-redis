@@ -33,7 +33,7 @@ impl RespDecode for SimpleError {
 }
 
 impl SimpleError {
-    fn new(s: impl Into<String>) -> Self {
+    pub fn new(s: impl Into<String>) -> Self {
         SimpleError(s.into())
     }
 }
