@@ -3,16 +3,18 @@ use enum_dispatch::enum_dispatch;
 use thiserror::Error;
 
 pub use self::{
-    bulk_string::BulkString, bulk_string::NullBulkString, frame::RespFrame,
-    simple_error::SimpleError, simple_string::SimpleString,
+    array::Array, array::NullArray, bulk_string::BulkString, bulk_string::NullBulkString,
+    frame::RespFrame, simple_error::SimpleError, simple_string::SimpleString,
 };
 
+mod array;
 mod bulk_string;
 mod frame;
 mod integer;
 mod simple_error;
 mod simple_string;
 
+const BUF_CAP: usize = 4096;
 const CRLF: &[u8] = b"\r\n";
 const CRLF_LEN: usize = CRLF.len();
 
@@ -89,4 +91,36 @@ fn parse_len(buf: &[u8], prefix: &str) -> Result<(usize, usize), RespErr> {
     let end = extract_frame_data(buf, prefix)?;
     let s = String::from_utf8_lossy(&buf[prefix.len()..end]);
     Ok((end, s.parse()?))
+}
+
+fn calc_total_len(buf: &[u8], end: usize, len: usize, prefix: &str) -> Result<usize, RespErr> {
+    let mut total = end + CRLF_LEN;
+    let mut data = &buf[total..];
+
+    match prefix {
+        "*" | "~" => {
+            for _ in 0..len {
+                let frame_len = RespFrame::expect_len(data)?;
+                if data.len() < frame_len {
+                    return Err(RespErr::NotComplete);
+                }
+                data = &data[frame_len..];
+                total += frame_len;
+            }
+            Ok(total)
+        }
+        "%" => {
+            for _ in 0..len {
+                let frame_len = SimpleString::expect_len(data)?;
+                data = &data[frame_len..];
+                total += frame_len;
+
+                let frame_len = RespFrame::expect_len(data)?;
+                data = &data[frame_len..];
+                total += frame_len;
+            }
+            Ok(total)
+        }
+        _ => Ok(len + CRLF_LEN),
+    }
 }
