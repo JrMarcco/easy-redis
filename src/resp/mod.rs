@@ -113,10 +113,16 @@ fn calc_total_len(buf: &[u8], end: usize, len: usize, prefix: &str) -> Result<us
             for _ in 0..len {
                 let frame_len = SimpleString::expect_len(data)?;
                 data = &data[frame_len..];
+                if data.len() < frame_len {
+                    return Err(RespErr::NotComplete);
+                }
                 total += frame_len;
 
                 let frame_len = RespFrame::expect_len(data)?;
                 data = &data[frame_len..];
+                if data.len() < frame_len {
+                    return Err(RespErr::NotComplete);
+                }
                 total += frame_len;
             }
             Ok(total)
