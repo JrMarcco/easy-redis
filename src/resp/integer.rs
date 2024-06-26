@@ -14,6 +14,7 @@ impl RespEncode for i64 {
 impl RespDecode for i64 {
     const PREFIX: &'static str = ":";
 
+    // noinspection ALL
     fn decode(buf: &mut BytesMut) -> Result<Self, RespErr> {
         let end = extract_frame_data(buf, Self::PREFIX)?;
         let data = buf.split_to(end + CRLF_LEN);

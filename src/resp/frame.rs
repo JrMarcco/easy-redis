@@ -18,6 +18,7 @@ pub enum RespFrame {
     NullArray(NullArray),
     Null(Null),
     Boolean(bool),
+    Double(f64),
 }
 
 impl RespDecode for RespFrame {

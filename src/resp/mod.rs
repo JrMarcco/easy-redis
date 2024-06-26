@@ -10,6 +10,7 @@ pub use self::{
 mod array;
 mod boolean;
 mod bulk_string;
+mod double;
 mod frame;
 mod integer;
 mod null;
@@ -41,6 +42,8 @@ pub enum RespErr {
 
     #[error("Parse error: {0}")]
     ParseIntError(#[from] std::num::ParseIntError),
+    #[error("Parse error: {0}")]
+    ParseFloatError(#[from] std::num::ParseFloatError),
 }
 
 fn find_crlf(buf: &[u8], nth: usize) -> Option<usize> {
