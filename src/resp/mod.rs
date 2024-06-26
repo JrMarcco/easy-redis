@@ -4,13 +4,14 @@ use thiserror::Error;
 
 pub use self::{
     array::Array, array::NullArray, bulk_string::BulkString, bulk_string::NullBulkString,
-    frame::RespFrame, simple_error::SimpleError, simple_string::SimpleString,
+    frame::RespFrame, null::Null, simple_error::SimpleError, simple_string::SimpleString,
 };
 
 mod array;
 mod bulk_string;
 mod frame;
 mod integer;
+mod null;
 mod simple_error;
 mod simple_string;
 
@@ -68,6 +69,7 @@ fn extract_frame_data(buf: &[u8], prefix: &str) -> Result<usize, RespErr> {
     }
 
     let end = find_crlf(buf, 1).ok_or(RespErr::NotComplete)?;
+
     Ok(end)
 }
 
