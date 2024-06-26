@@ -46,7 +46,7 @@ footer = """
 trim = true
 # postprocessors
 postprocessors = [
-    { pattern = '\$REPO', replace = "https://github.com/jrmarcco/easy-redis-proxy" }, # replace repository URL
+    { pattern = '\$REPO', replace = "https://github.com/jrmarcco/easy-redis" }, # replace repository URL
 ]
 
 [git]

@@ -1,6 +1,4 @@
-# Easy Redis Proxy
+# Easy Redis
 
-An simple redis proxy. 
-Just redirect redis-cli command to redis server.
-
+An simple redis server.
 This is one pointless project just for practise.
