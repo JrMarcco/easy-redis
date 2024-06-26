@@ -112,13 +112,6 @@ mod tests {
 
     #[test]
     fn test_map_decode() -> Result<()> {
-        let mut buf = BytesMut::new();
-        buf.extend_from_slice(
-            b"%3\r\n+foo\r\n,+1.23\r\n+hello\r\n$5\r\nworld\r\n+int\r\n:+456\r\n",
-        );
-
-        let frame = Map::decode(&mut buf)?;
-
         let mut map = Map::new();
         map.insert(
             "hello".to_string(),
@@ -127,6 +120,14 @@ mod tests {
 
         map.insert("foo".to_string(), 1.23.into());
         map.insert("int".to_string(), 456.into());
+
+        let mut buf = BytesMut::new();
+        buf.extend_from_slice(
+            b"%3\r\n+foo\r\n,+1.23\r\n+hello\r\n$5\r\nworld\r\n+int\r\n:+456\r\n",
+        );
+
+        let frame = Map::decode(&mut buf)?;
+
         assert_eq!(frame, map);
 
         buf.extend_from_slice(b"%3\r\n+foo\r\n,+1.23\r\n+hello\r\n$5\r\nworld\r\n+int\r\n");

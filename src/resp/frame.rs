@@ -2,7 +2,7 @@ use bytes::BytesMut;
 use enum_dispatch::enum_dispatch;
 
 use crate::{
-    Array, BulkString, Map, Null, NullArray, NullBulkString, RespDecode, RespErr, SimpleError,
+    Array, BulkString, Map, Null, NullArray, NullBulkString, RespDecode, RespErr, Set, SimpleError,
     SimpleString,
 };
 
@@ -20,6 +20,7 @@ pub enum RespFrame {
     Boolean(bool),
     Double(f64),
     Map(Map),
+    Set(Set),
 }
 
 impl RespDecode for RespFrame {
@@ -78,6 +79,10 @@ impl RespDecode for RespFrame {
                 let frame = Map::decode(buf)?;
                 Ok(frame.into())
             }
+            Some(b'~') => {
+                let frame = Set::decode(buf)?;
+                Ok(frame.into())
+            }
             _ => Err(RespErr::NotComplete),
         }
     }
@@ -94,6 +99,7 @@ impl RespDecode for RespFrame {
             Some(b'#') => bool::expect_len(buf),
             Some(b',') => f64::expect_len(buf),
             Some(b'%') => Map::expect_len(buf),
+            Some(b'~') => Set::expect_len(buf),
             _ => Err(RespErr::NotComplete),
         }
     }

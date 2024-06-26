@@ -12,7 +12,7 @@ pub struct Array(pub(crate) Vec<RespFrame>);
 impl RespEncode for Array {
     fn encode(self) -> Vec<u8> {
         let mut buf = Vec::with_capacity(BUF_CAP);
-        buf.extend_from_slice(&format!("*{}\r\n", self.0.len()).into_bytes());
+        buf.extend_from_slice(&format!("*{}\r\n", self.len()).into_bytes());
         for frame in self.0 {
             buf.extend_from_slice(&frame.encode());
         }
@@ -121,14 +121,13 @@ mod tests {
 
     #[test]
     fn test_array_decode() -> Result<()> {
+        let array = Array::new([b"set".into(), b"hello".into(), b"world".into()]);
+
         let mut buf = BytesMut::new();
         buf.extend_from_slice(b"*3\r\n$3\r\nset\r\n$5\r\nhello\r\n$5\r\nworld\r\n");
 
         let frame = Array::decode(&mut buf)?;
-        assert_eq!(
-            frame,
-            Array::new([b"set".into(), b"hello".into(), b"world".into()])
-        );
+        assert_eq!(frame, array);
 
         buf.extend_from_slice(b"*3\r\n$3\r\nset\r\n$5\r\nhello\r\n");
         let ret = Array::decode(&mut buf);
@@ -136,10 +135,7 @@ mod tests {
 
         buf.extend_from_slice(b"$5\r\nworld\r\n");
         let frame = Array::decode(&mut buf)?;
-        assert_eq!(
-            frame,
-            Array::new([b"set".into(), b"hello".into(), b"world".into()])
-        );
+        assert_eq!(frame, array);
 
         buf.extend_from_slice(b"*3\r\n$3\r\nset\r\n$5\r\nhello\r\n$5\r\n");
         let ret = Array::decode(&mut buf);
@@ -147,10 +143,7 @@ mod tests {
 
         buf.extend_from_slice(b"world\r\n");
         let frame = Array::decode(&mut buf)?;
-        assert_eq!(
-            frame,
-            Array::new([b"set".into(), b"hello".into(), b"world".into()])
-        );
+        assert_eq!(frame, array);
 
         Ok(())
     }

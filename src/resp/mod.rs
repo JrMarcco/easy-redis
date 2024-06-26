@@ -4,7 +4,8 @@ use thiserror::Error;
 
 pub use self::{
     array::Array, array::NullArray, bulk_string::BulkString, bulk_string::NullBulkString,
-    frame::RespFrame, map::Map, null::Null, simple_error::SimpleError, simple_string::SimpleString,
+    frame::RespFrame, map::Map, null::Null, set::Set, simple_error::SimpleError,
+    simple_string::SimpleString,
 };
 
 mod array;
@@ -15,6 +16,7 @@ mod frame;
 mod integer;
 mod map;
 mod null;
+mod set;
 mod simple_error;
 mod simple_string;
 
