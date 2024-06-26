@@ -8,6 +8,7 @@ pub use self::{
 };
 
 mod array;
+mod boolean;
 mod bulk_string;
 mod frame;
 mod integer;

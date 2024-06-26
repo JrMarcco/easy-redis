@@ -17,6 +17,7 @@ pub enum RespFrame {
     Array(Array),
     NullArray(NullArray),
     Null(Null),
+    Boolean(bool),
 }
 
 impl RespDecode for RespFrame {
@@ -63,6 +64,10 @@ impl RespDecode for RespFrame {
                 let frame = Null::decode(buf)?;
                 Ok(frame.into())
             }
+            Some(b'#') => {
+                let frame = bool::decode(buf)?;
+                Ok(frame.into())
+            }
             _ => Err(RespErr::NotComplete),
         }
     }
@@ -76,6 +81,7 @@ impl RespDecode for RespFrame {
             Some(b'$') => BulkString::expect_len(buf),
             Some(b'*') => Array::expect_len(buf),
             Some(b'_') => Null::expect_len(buf),
+            Some(b'#') => bool::expect_len(buf),
             _ => Err(RespErr::NotComplete),
         }
     }
