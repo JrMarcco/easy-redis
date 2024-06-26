@@ -41,6 +41,7 @@ impl RespDecode for Array {
         Ok(Array::new(frames))
     }
 
+    // noinspection DuplicatedCode
     fn expect_len(buf: &[u8]) -> Result<usize, RespErr> {
         let (end, len) = parse_len(buf, Self::PREFIX)?;
         calc_total_len(buf, end, len, Self::PREFIX)

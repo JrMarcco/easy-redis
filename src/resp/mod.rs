@@ -4,7 +4,7 @@ use thiserror::Error;
 
 pub use self::{
     array::Array, array::NullArray, bulk_string::BulkString, bulk_string::NullBulkString,
-    frame::RespFrame, null::Null, simple_error::SimpleError, simple_string::SimpleString,
+    frame::RespFrame, map::Map, null::Null, simple_error::SimpleError, simple_string::SimpleString,
 };
 
 mod array;
@@ -13,6 +13,7 @@ mod bulk_string;
 mod double;
 mod frame;
 mod integer;
+mod map;
 mod null;
 mod simple_error;
 mod simple_string;
@@ -105,6 +106,7 @@ fn calc_total_len(buf: &[u8], end: usize, len: usize, prefix: &str) -> Result<us
 
     match prefix {
         "*" | "~" => {
+            // array & set
             for _ in 0..len {
                 let frame_len = RespFrame::expect_len(data)?;
                 if data.len() < frame_len {
@@ -116,20 +118,21 @@ fn calc_total_len(buf: &[u8], end: usize, len: usize, prefix: &str) -> Result<us
             Ok(total)
         }
         "%" => {
+            // map
             for _ in 0..len {
-                let frame_len = SimpleString::expect_len(data)?;
-                data = &data[frame_len..];
-                if data.len() < frame_len {
+                let key_len = SimpleString::expect_len(data)?;
+                if data.len() < key_len {
                     return Err(RespErr::NotComplete);
                 }
-                total += frame_len;
+                data = &data[key_len..];
+                total += key_len;
 
-                let frame_len = RespFrame::expect_len(data)?;
-                data = &data[frame_len..];
-                if data.len() < frame_len {
+                let value_len = RespFrame::expect_len(data)?;
+                if data.len() < value_len {
                     return Err(RespErr::NotComplete);
                 }
-                total += frame_len;
+                data = &data[value_len..];
+                total += value_len;
             }
             Ok(total)
         }
