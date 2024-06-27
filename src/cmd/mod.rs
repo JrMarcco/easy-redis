@@ -20,6 +20,9 @@ pub trait CmdExecutor {
 pub enum Cmd {
     Set(Set),
     Get(Get),
+    HSet(HSet),
+    HGet(HGet),
+    HGetAll(HGetAll),
 
     // unrecognized command
     Unrecognized(Unrecognized),
@@ -34,6 +37,25 @@ pub struct Set {
 #[derive(Debug)]
 pub struct Get {
     key: String,
+}
+
+#[derive(Debug)]
+pub struct HSet {
+    key: String,
+    field: String,
+    value: RespFrame,
+}
+
+#[derive(Debug)]
+pub struct HGet {
+    key: String,
+    field: String,
+}
+
+#[derive(Debug)]
+pub struct HGetAll {
+    key: String,
+    sort: bool,
 }
 
 #[derive(Debug)]

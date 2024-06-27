@@ -25,18 +25,18 @@ impl Backend {
         self.map.get(key).map(|v| v.value().clone())
     }
 
-    pub fn hash_set(&self, key: String, field: String, value: RespFrame) {
+    pub fn hset(&self, key: String, field: String, value: RespFrame) {
         let map = self.hash_map.entry(key).or_default();
         map.insert(field, value);
     }
 
-    pub fn hash_get(&self, key: &str, field: &str) -> Option<RespFrame> {
+    pub fn hget(&self, key: &str, field: &str) -> Option<RespFrame> {
         self.hash_map
             .get(key)
             .and_then(|v| v.get(field).map(|v| v.value().clone()))
     }
 
-    pub fn hash_get_all(&self, key: &str) -> Option<DashMap<String, RespFrame>> {
+    pub fn hgetall(&self, key: &str) -> Option<DashMap<String, RespFrame>> {
         self.hash_map.get(key).map(|v| v.clone())
     }
 }
