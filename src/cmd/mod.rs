@@ -80,6 +80,9 @@ impl TryFrom<Array> for Cmd {
             Some(RespFrame::BulkString(ref cmd)) => match cmd.as_ref() {
                 b"set" => Ok(Set::try_from(value)?.into()),
                 b"get" => Ok(Get::try_from(value)?.into()),
+                b"hset" => Ok(HSet::try_from(value)?.into()),
+                b"hget" => Ok(HGet::try_from(value)?.into()),
+                b"hgetall" => Ok(HGetAll::try_from(value)?.into()),
                 _ => Ok(Unrecognized.into()),
             },
             _ => Err(CmdErr::InvalidCmd(
