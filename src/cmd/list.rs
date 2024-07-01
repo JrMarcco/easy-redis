@@ -230,14 +230,14 @@ mod tests {
 
         let cmd = RPush {
             key: "jrmarcco".to_string(),
-            value: RespFrame::BulkString("foo".into()),
+            value: RespFrame::Double(1.23),
         };
         let ret = cmd.exec(&backend);
         assert_eq!(ret, RESP_OK.clone());
 
         let cmd = RPush {
             key: "jrmarcco".to_string(),
-            value: RespFrame::BulkString("bar".into()),
+            value: RespFrame::Double(4.56),
         };
         let ret = cmd.exec(&backend);
         assert_eq!(ret, RESP_OK.clone());
@@ -246,7 +246,7 @@ mod tests {
             key: "jrmarcco".to_string(),
         };
         let ret = cmd.exec(&backend);
-        assert_eq!(ret, RespFrame::BulkString("bar".into()));
+        assert_eq!(ret, RespFrame::Double(4.56));
 
         let cmd = LLen {
             key: "jrmarcco".to_string(),
