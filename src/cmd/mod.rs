@@ -1,4 +1,5 @@
 mod hash_map;
+mod list;
 mod map;
 
 use crate::{Array, Backend, RespErr, RespFrame, SimpleString};
@@ -23,6 +24,11 @@ pub enum Cmd {
     HSet(HSet),
     HGet(HGet),
     HGetAll(HGetAll),
+    LPush(LPush),
+    LPop(LPop),
+    RPush(RPush),
+    RPop(RPop),
+    LLen(LLen),
 
     // unrecognized command
     Unrecognized(Unrecognized),
@@ -59,6 +65,33 @@ pub struct HGetAll {
 }
 
 #[derive(Debug)]
+pub struct LPush {
+    key: String,
+    value: RespFrame,
+}
+
+#[derive(Debug)]
+pub struct LPop {
+    key: String,
+}
+
+#[derive(Debug)]
+pub struct RPush {
+    key: String,
+    value: RespFrame,
+}
+
+#[derive(Debug)]
+pub struct RPop {
+    key: String,
+}
+
+#[derive(Debug)]
+pub struct LLen {
+    key: String,
+}
+
+#[derive(Debug)]
 pub struct Unrecognized;
 
 impl TryFrom<RespFrame> for Cmd {
@@ -83,6 +116,7 @@ impl TryFrom<Array> for Cmd {
                 b"hset" => Ok(HSet::try_from(value)?.into()),
                 b"hget" => Ok(HGet::try_from(value)?.into()),
                 b"hgetall" => Ok(HGetAll::try_from(value)?.into()),
+                b"lpush" => Ok(LPush::try_from(value)?.into()),
                 _ => Ok(Unrecognized.into()),
             },
             _ => Err(CmdErr::InvalidCmd(
