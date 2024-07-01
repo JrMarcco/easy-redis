@@ -1,8 +1,10 @@
-use crate::RespFrame;
-use dashmap::DashMap;
 use std::collections::VecDeque;
 use std::ops::Deref;
 use std::sync::Arc;
+
+use dashmap::DashMap;
+
+use crate::RespFrame;
 
 #[derive(Debug, Clone)]
 pub struct Backend(Arc<BackendInner>);
@@ -61,7 +63,7 @@ impl Backend {
     }
 
     pub fn llen(&self, key: &str) -> Option<usize> {
-        self.list_map.get(key).map(|ret| ret.value().len())
+        self.list_map.get(key).map(|ret| ret.len())
     }
 }
 
